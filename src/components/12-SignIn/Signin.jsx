@@ -54,6 +54,8 @@ export const SignIn = () => {
   };
 
   const handlesubmit = () => {
+    setLoading(true);
+
     if (inputs.username.length <= 0) {
       setErrorStatus({
         errorstatus: true,
@@ -85,8 +87,11 @@ export const SignIn = () => {
 
         if (data.success) {
           localStorage.setItem("JWTtoken", "Bearer " + data.token + "");
+          localStorage.setItem("ublisYogaRegistration", true);
           navigate("/");
         } else {
+          setLoading(false);
+
           setErrorStatus({
             errorstatus: true,
             errormessage: data.message || "Something Went Wrong Try Again.",
@@ -110,6 +115,8 @@ export const SignIn = () => {
         console.error("Error: ", err);
       });
   };
+
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="py-[20vh] flex justify-center items-center bg-[#f9f3eb]">
@@ -160,12 +167,25 @@ export const SignIn = () => {
             ) : null}
           </div>
           <div className="w-[100%] mt-3">
-            <NormalButton
-              onClick={() => {
-                handlesubmit();
-              }}
-              label="Sign In"
-            />
+            {loading ? (
+              <>
+                <svg className="loadersvg my-4" viewBox="25 25 50 50">
+                  <circle
+                    className="loadercircle"
+                    r="20"
+                    cy="50"
+                    cx="50"
+                  ></circle>
+                </svg>
+              </>
+            ) : (
+              <NormalButton
+                onClick={() => {
+                  handlesubmit();
+                }}
+                label="Sign In"
+              />
+            )}
           </div>
           <div className="mt-4">
             <h1

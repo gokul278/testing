@@ -11,7 +11,7 @@ import Axios from "axios";
 import CryptoJS from "crypto-js";
 import { useNavigate } from "react-router-dom";
 
-const RegistrationStepper = () => {
+const RegistrationStepper = ({ closeregistration }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -128,7 +128,7 @@ const RegistrationStepper = () => {
 
   const [branchList, setBranchList] = useState([]);
 
-  const [personalHealthProblem, setPersonalHealthProblem] = useState([]);
+  // const [personalHealthProblem, setPersonalHealthProblem] = useState([]);
 
   const timingOptions = preferableTiming.map((timing) => {
     const [key, value] = Object.entries(timing)[0]; // Extract the key-value pair from the object
@@ -244,6 +244,8 @@ const RegistrationStepper = () => {
 
     setLoading(true);
 
+    console.log(updatedHealthProblem);
+
     Axios.post(
       import.meta.env.VITE_API_URL + "profile/RegisterData",
 
@@ -288,7 +290,7 @@ const RegistrationStepper = () => {
           refOthers: inputs.activities,
           refElse: inputs.anthingelse,
           refOtherActivities: inputs.others,
-          refPresentHealth: personalHealthProblem,
+          refPresentHealth: updatedHealthProblem,
           refMedicalDetails: inputs.medicaldetails,
           refUnderPhysicalCare: selectedOption.care === "yes" ? true : false,
           refDoctor: inputs.doctorname,
@@ -315,8 +317,11 @@ const RegistrationStepper = () => {
           import.meta.env.VITE_ENCRYPTION_KEY
         );
 
+        console.log(data.success);
+
         if (data.success) {
           navigate("/");
+          closeregistration();
         }
       })
       .catch((err) => {
@@ -326,7 +331,7 @@ const RegistrationStepper = () => {
   };
 
   return (
-    <div className="w-[100%] lg:w-[100%] h-[100vh]  blur-[0.2px] bg-[#000000ad] flex justify-center items-center absolute z-50">
+    <div className="w-[100%] lg:w-[100%] h-[100vh] bg-black/80 blur-[0.2px]  flex justify-center items-center fixed z-50">
       <div
         className="w-[95%] lg:w-[70%] h-[90vh] bg-white rounded shadow-sm"
         align="center"
@@ -340,13 +345,22 @@ const RegistrationStepper = () => {
               }}
             >
               <div className="w-full h-[7vh] flex justify-center items-center">
-                <h1 className="text-[20px] justify-center font-semibold text-[#ff5001]">
-                  Personal Details
-                </h1>
+                <div className="w-[90%] justify-between flex h-[7vh] items-center">
+                  <h1 className="text-[20px] justify-center font-semibold text-[#ff5001]">
+                    Personal Details
+                  </h1>
+                  <div
+                    onClick={() => {
+                      closeregistration();
+                    }}
+                  >
+                    <i className="fa-solid fa-xmark text-[20px] cursor-pointer"></i>
+                  </div>
+                </div>
               </div>
               <hr />
               <div className="w-full h-[73vh] overflow-y-auto">
-                <div className="w-[90%] mb-[15px] mt-3" align="start">
+                <div className="w-[90%] mb-[20px] mt-3" align="start">
                   <TextInput
                     id="userid"
                     type="text"
@@ -360,7 +374,7 @@ const RegistrationStepper = () => {
                   />
                 </div>
 
-                <div className="w-[90%] mb-[15px]" align="start">
+                <div className="w-[90%] mb-[20px]" align="start">
                   <TextInput
                     id="emailid"
                     type="email"
@@ -373,7 +387,7 @@ const RegistrationStepper = () => {
                   />
                 </div>
                 <div
-                  className="w-[90%] mb-[15px] flex justify-between"
+                  className="w-[90%] mb-[20px] flex justify-between"
                   align="start"
                 >
                   <div className="w-[48%]">
@@ -403,7 +417,7 @@ const RegistrationStepper = () => {
                 </div>
 
                 <div
-                  className="w-[90%] mb-[15px] flex flex-wrap gap-y-5 justify-between"
+                  className="w-[90%] mb-[20px] flex flex-wrap gap-y-5 justify-between"
                   align="start"
                 >
                   <div className="w-[100%] lg:w-[40%]">
@@ -444,7 +458,7 @@ const RegistrationStepper = () => {
                 </div>
 
                 <div
-                  className="w-[90%] mb-[15px] flex justify-between"
+                  className="w-[90%] mb-[20px] flex justify-between"
                   align="start"
                 >
                   <div className="w-[68%]">
@@ -473,7 +487,7 @@ const RegistrationStepper = () => {
                   </div>
                 </div>
                 <div
-                  className="w-[90%] mb-[15px] flex justify-between"
+                  className="w-[90%] mb-[20px] flex justify-between"
                   align="start"
                 >
                   <SelectInput
@@ -489,7 +503,7 @@ const RegistrationStepper = () => {
                     onChange={(e) => handleInput(e)}
                   />
                 </div>
-                <div className="w-[90%] mb-[15px]" align="start">
+                <div className="w-[90%] mb-[20px]" align="start">
                   <TextInput
                     id="father"
                     type="text"
@@ -503,7 +517,7 @@ const RegistrationStepper = () => {
                 </div>
 
                 <div
-                  className="w-[90%] mb-[15px] flex justify-between"
+                  className="w-[90%] mb-[20px] flex justify-between"
                   align="start"
                 >
                   <div className="w-[48%]">
@@ -532,7 +546,7 @@ const RegistrationStepper = () => {
                   </div>
                 </div>
                 {/* <div
-                  className="w-[90%] mb-[15px] flex justify-between items-center"
+                  className="w-[90%] mb-[20px] flex justify-between items-center"
                   align="start"
                 >
                   <CheckboxInput
@@ -562,10 +576,10 @@ const RegistrationStepper = () => {
                   align="start"
                 >
                   <div className="w-full" align="center">
-                    <label className="text-[#45474b] mb-[15px] text-[18px] font-semibold">
+                    <label className="text-[#45474b] mb-[20px] text-[18px] font-semibold">
                       Permanent Address
                     </label>
-                    <div className="mb-[15px]">
+                    <div className="mb-[20px]">
                       <TextInput
                         id="tempaddress"
                         name="peraddress"
@@ -578,7 +592,7 @@ const RegistrationStepper = () => {
                       />
                     </div>
                     <div
-                      className="w-[100%] mb-[15px] flex justify-between"
+                      className="w-[100%] mb-[20px] flex justify-between"
                       align="start"
                     >
                       <div className="w-[48%]">
@@ -615,10 +629,26 @@ const RegistrationStepper = () => {
                             required
                             value={inputs.percity}
                             onChange={(e) => {
-                              setInputs({
+                              const { name, value } = e.target;
+
+                              let updatedInputs = {
                                 ...inputs,
-                                [e.target.name]: e.target.value,
-                              });
+                                [name]: value,
+                              };
+
+                              // If the "addressboth" flag is true, copy the permanent address fields to temporary fields
+                              if (updatedInputs.addressboth) {
+                                updatedInputs = {
+                                  ...updatedInputs,
+                                  tempaddess: updatedInputs.peraddress,
+                                  tempstate: updatedInputs.perstate,
+                                  tempincode: updatedInputs.perpincode,
+                                  tempcity: updatedInputs.percity,
+                                };
+                              }
+
+                              // Set the final updated inputs
+                              setInputs(updatedInputs);
                             }}
                             disabled={!selectedState}
                             className="relative w-full h-10 px-3 transition-all bg-white border-2 rounded outline-none appearance-none peer border-[#b3b4b6] text-[#4c4c4e] autofill:bg-white focus:border-[#ff5001] focus:focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
@@ -639,7 +669,7 @@ const RegistrationStepper = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="w-[100%] mb-[15px]" align="start">
+                    <div className="w-[100%] mb-[20px]" align="start">
                       <TextInput
                         id="perpincode"
                         type="tel"
@@ -654,7 +684,7 @@ const RegistrationStepper = () => {
                   </div>
 
                   <div
-                    className="w-[90%] mb-[15px] flex justify-between items-center"
+                    className="w-[90%] mb-[20px] flex justify-between items-center"
                     align="start"
                   >
                     <CheckboxInput
@@ -688,10 +718,10 @@ const RegistrationStepper = () => {
                   </div>
 
                   <div className="w-full" align="center">
-                    <label className="text-[#45474b] mb-[15px] text-[18px] font-semibold">
+                    <label className="text-[#45474b] mb-[20px] text-[18px] font-semibold">
                       Communication Address
                     </label>
-                    <div className="w-[100%] mb-[15px]">
+                    <div className="w-[100%] mb-[20px]">
                       <TextInput
                         id="tempaddress"
                         name="tempaddess"
@@ -704,7 +734,7 @@ const RegistrationStepper = () => {
                       />
                     </div>
                     <div
-                      className="w-[100%] mb-[15px] flex justify-between"
+                      className="w-[100%] mb-[20px] flex justify-between"
                       align="start"
                     >
                       <div className="w-[48%]">
@@ -803,14 +833,23 @@ const RegistrationStepper = () => {
               }}
             >
               <div className="w-full h-[7vh] flex justify-center items-center">
-                <h1 className="text-[20px] justify-center font-semibold text-[#ff5001]">
-                  General Health Details
-                </h1>
+                <div className="w-[90%] justify-between flex h-[7vh] items-center">
+                  <h1 className="text-[20px] justify-center font-semibold text-[#ff5001]">
+                    General Health Details
+                  </h1>
+                  <div
+                    onClick={() => {
+                      closeregistration();
+                    }}
+                  >
+                    <i className="fa-solid fa-xmark text-[20px] cursor-pointer"></i>
+                  </div>
+                </div>
               </div>
               <hr />
               <div className="w-full h-[73vh] overflow-auto">
                 <div
-                  className="w-[90%] mt-3 mb-[15px] flex justify-between"
+                  className="w-[90%] mt-3 mb-[20px] flex justify-between"
                   align="start"
                 >
                   <div className="w-[48%]">
@@ -840,7 +879,7 @@ const RegistrationStepper = () => {
                 </div>
 
                 <div
-                  className="w-[90%] mb-[15px] flex justify-between"
+                  className="w-[90%] mb-[20px] flex justify-between"
                   align="start"
                 >
                   <div className="w-[48%]">
@@ -876,7 +915,7 @@ const RegistrationStepper = () => {
                   </div>
                 </div>
 
-                <div className="w-[90%] mb-[15px]" align="start">
+                <div className="w-[90%] mb-[20px]" align="start">
                   <TextInput
                     id="bp"
                     type="tel"
@@ -894,7 +933,7 @@ const RegistrationStepper = () => {
                       label={"Recent injuries / Accidents / Operations *"}
                     />
                   </div>
-                  <div className="flex w-[90%] gap-x-10 mt-2 mb-[15px]">
+                  <div className="flex w-[90%] gap-x-10 mt-2 mb-[20px]">
                     <RadioButton
                       id="accidentyes"
                       value="yes"
@@ -924,7 +963,7 @@ const RegistrationStepper = () => {
                       required
                     />
                   </div>
-                  <div className="mb-[15px]">
+                  <div className="mb-[20px]">
                     <TextInput
                       id="accidentdetail"
                       type="text"
@@ -946,7 +985,7 @@ const RegistrationStepper = () => {
                       label={"Recent breaks / Fractures / Sprains *"}
                     />
                   </div>
-                  <div className="flex w-[90%] gap-x-10 mt-2 mb-[15px]">
+                  <div className="flex w-[90%] gap-x-10 mt-2 mb-[20px]">
                     <RadioButton
                       id="breaksyes"
                       value="yes"
@@ -976,7 +1015,7 @@ const RegistrationStepper = () => {
                       required
                     />
                   </div>
-                  <div className="mb-[15px]">
+                  <div className="mb-[20px]">
                     <TextInput
                       id="breaksdetail"
                       type="text"
@@ -990,7 +1029,7 @@ const RegistrationStepper = () => {
                   </div>
                 </div>
 
-                <div className="w-[90%] mb-[15px]">
+                <div className="w-[90%] mb-[20px]">
                   <div className="w-full">
                     <TextInput
                       id="otheractivities"
@@ -1005,7 +1044,7 @@ const RegistrationStepper = () => {
                   </div>
                 </div>
 
-                <div className="w-[90%] mb-[15px]">
+                <div className="w-[90%] mb-[20px]">
                   <div className="w-full">
                     <TextInput
                       id="anythingelse"
@@ -1019,7 +1058,7 @@ const RegistrationStepper = () => {
                   </div>
                 </div>
 
-                <div className="w-[90%] flex justify-between mb-[15px]">
+                <div className="w-[90%] flex justify-between mb-[20px]">
                   <div className="w-[30%]">
                     <SelectInput
                       id="branch"
@@ -1078,9 +1117,18 @@ const RegistrationStepper = () => {
               }}
             >
               <div className="w-full h-[7vh] flex justify-center items-center">
-                <h1 className="text-[20px] justify-center font-semibold text-[#ff5001]">
-                  Past or Present Health Problems
-                </h1>
+                <div className="w-[90%] justify-between flex h-[7vh] items-center">
+                  <h1 className="text-[20px] justify-center font-semibold text-[#ff5001]">
+                    Past or Present Health Problems
+                  </h1>
+                  <div
+                    onClick={() => {
+                      closeregistration();
+                    }}
+                  >
+                    <i className="fa-solid fa-xmark text-[20px] cursor-pointer"></i>
+                  </div>
+                </div>
               </div>
               <hr />
               <div className="w-full h-[73vh] overflow-auto">
@@ -1097,7 +1145,7 @@ const RegistrationStepper = () => {
                   ))}
                 </div>
 
-                <div className="w-[90%] mb-[15px]">
+                <div className="w-[90%] mb-[20px]">
                   <TextInput
                     id="others"
                     type="text"
@@ -1109,7 +1157,7 @@ const RegistrationStepper = () => {
                   />
                 </div>
 
-                <div className="w-[90%] mb-[15px]">
+                <div className="w-[90%] mb-[20px]">
                   <TextInput
                     id="medicationdetails"
                     type="text"
@@ -1125,7 +1173,7 @@ const RegistrationStepper = () => {
                   <div>
                     <TextLabel label={"Under Physicians Care *"} />
                   </div>
-                  <div className="flex w-[90%] gap-x-10 mt-2 mb-[15px]">
+                  <div className="flex w-[90%] gap-x-10 mt-2 mb-[20px]">
                     <RadioButton
                       id="careyes"
                       value="yes"
@@ -1155,7 +1203,7 @@ const RegistrationStepper = () => {
                       required
                     />
                   </div>
-                  <div className="mb-[15px]">
+                  <div className="mb-[20px]">
                     <TextInput
                       id="doctorname"
                       type="text"
@@ -1169,7 +1217,7 @@ const RegistrationStepper = () => {
                       onChange={(e) => handleInput(e)}
                     />
                   </div>
-                  <div className="mt-3 mb-[15px]">
+                  <div className="mt-3 mb-[20px]">
                     <TextInput
                       id="hospital"
                       type="text"
@@ -1189,7 +1237,7 @@ const RegistrationStepper = () => {
                   <div>
                     <TextLabel label={"Back Pain *"} />
                   </div>
-                  <div className="flex w-[90%] gap-x-10 mt-2 mb-[15px]">
+                  <div className="flex w-[90%] gap-x-10 mt-2 mb-[20px]">
                     <RadioButton
                       id="backpainyes"
                       value="yes"
@@ -1219,7 +1267,7 @@ const RegistrationStepper = () => {
                       required
                     />
                   </div>
-                  <div className="mb-[15px]">
+                  <div className="mb-[20px]">
                     <SelectInput
                       id="pain"
                       name="painscale"
@@ -1271,13 +1319,22 @@ const RegistrationStepper = () => {
               }}
             >
               <div className="w-full h-[7vh] flex justify-center items-center">
-                <h1 className="text-[20px] justify-center font-semibold text-[#ff5001]">
-                  Therapy
-                </h1>
+                <div className="w-[90%] justify-between flex h-[7vh] items-center">
+                  <h1 className="text-[20px] justify-center font-semibold text-[#ff5001]">
+                    Therapy
+                  </h1>
+                  <div
+                    onClick={() => {
+                      closeregistration();
+                    }}
+                  >
+                    <i className="fa-solid fa-xmark text-[20px] cursor-pointer"></i>
+                  </div>
+                </div>
               </div>
               <hr />
               <div className="w-full h-[73vh] overflow-auto">
-                <div className="w-[90%] mt-3 mb-[15px]">
+                <div className="w-[90%] mt-3 mb-[20px]">
                   <TextInput
                     id="durationproblem"
                     type="text"
@@ -1288,7 +1345,7 @@ const RegistrationStepper = () => {
                     onChange={(e) => handleInput(e)}
                   />
                 </div>
-                <div className="w-[90%] mb-[15px]">
+                <div className="w-[90%] mb-[20px]">
                   <TextInput
                     id="relevantpasthistory"
                     type="text"
@@ -1299,7 +1356,7 @@ const RegistrationStepper = () => {
                     onChange={(e) => handleInput(e)}
                   />
                 </div>
-                <div className="w-[90%] mb-[15px]">
+                <div className="w-[90%] mb-[20px]">
                   <TextInput
                     id="relevantfamilyhistory"
                     type="text"
@@ -1310,7 +1367,7 @@ const RegistrationStepper = () => {
                     onChange={(e) => handleInput(e)}
                   />
                 </div>
-                <div className="w-[90%] mb-[15px]">
+                <div className="w-[90%] mb-[20px]">
                   <TextInput
                     id="anythingelsetherapy"
                     name="therapyanything"
@@ -1321,7 +1378,7 @@ const RegistrationStepper = () => {
                   />
                 </div>
 
-                <div className="w-[90%] mb-[15px]">
+                <div className="w-[90%] mb-[20px]">
                   <div className="text-[#45474b] text-[16px] font-semibold text-justify">
                     Disclaimer (Please Read Carefully) I have given all
                     information relevant for yoga class. I Understand that the
@@ -1344,7 +1401,7 @@ const RegistrationStepper = () => {
                   </div>
                 </div>
 
-                <div className="w-[90%] mb-[15px]">
+                <div className="w-[90%] mb-[20px]">
                   <CheckboxInput
                     checked={agreementchecked}
                     id="agreementchecked"

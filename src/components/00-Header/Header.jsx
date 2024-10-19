@@ -6,6 +6,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import logo from "../../assets/logos/Ublis Yoga - Logo 2.png";
 import RegistrationStepper from "../../pages/RegistrationStepper/RegistrationStepper";
 import svg from "../../assets/home/user.svg";
+import Axios from "axios";
+import CryptoJS from "crypto-js";
+import RegistrationPopup from "../../pages/RegistrationPopup/RegistrationPopup";
 
 export default function Header() {
   const [headerBg, setHeaderBg] = useState("transparent");
@@ -13,6 +16,26 @@ export default function Header() {
   const [iconRotation, setIconRotation] = useState(180);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+
+  const decrypt = (encryptedData, iv, key) => {
+    const decrypted = CryptoJS.AES.decrypt(
+      {
+        ciphertext: CryptoJS.enc.Hex.parse(encryptedData),
+      },
+      CryptoJS.enc.Hex.parse(key),
+      {
+        iv: CryptoJS.enc.Hex.parse(iv),
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+      }
+    );
+
+    // Convert decrypted data to UTF-8 string and then parse it as JSON
+    const decryptedString = decrypted.toString(CryptoJS.enc.Utf8);
+
+    // Parse the string into a JSON object
+    return JSON.parse(decryptedString);
+  };
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -105,10 +128,6 @@ export default function Header() {
 
   const [registrationmodal, setRegistrationmodal] = useState(false);
 
-  const handleclosebtn = () => {
-    setRegistrationmodal(false);
-  };
-
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Function to toggle dropdown
@@ -131,16 +150,93 @@ export default function Header() {
     }
   };
 
+  const [logindetails, setLogindetails] = useState();
+  const [useStatus, setUseStatus] = useState({});
+
   // UseEffect to listen for outside clicks
   useEffect(() => {
     document.addEventListener("click", handleOutsideClick);
     return () => document.removeEventListener("click", handleOutsideClick);
   }, [isDropdownOpen]);
 
+  const [openmenu, setopenMenu] = useState(false);
+
+  useEffect(() => {
+
+    Axios.get(
+      import.meta.env.VITE_API_URL + "validatetoken",
+      {
+        headers: {
+          Authorization: localStorage.getItem("JWTtoken"),
+          "Content-Type": "application/json",
+        },
+      },
+      {}
+    ).then((res) => {
+      const data = decrypt(
+        res.data[1],
+        res.data[0],
+        import.meta.env.VITE_ENCRYPTION_KEY
+      );
+
+      console.log(data);
+
+      const refuId = data.data[0].refUtId;
+      const validIds = [1, 2, 3, 9];
+
+      if (!validIds.includes(refuId)) {
+        localStorage.removeItem("JWTtoken");
+        navigate("/signin");
+      }
+
+      // if (data.registerBtn.signUpCount) {
+      //   // setopenMenu(false);
+      // }
+
+      setUseStatus({
+        signUpCount: data.registerBtn.signUpCount,
+        followUpCount: data.registerBtn.followUpCount,
+      });
+
+      if (
+        localStorage.getItem("ublisYogaRegistration") === "true" &&
+        data.registerBtn.followUpCount
+      ) {
+        setopenMenu(true);
+      }
+
+      setLogindetails({
+        username: data.data[0].refUserName,
+        name: data.data[0].refStFName + " " + data.data[0].refStLName,
+      });
+    });
+  });
+
+  // , [navigate]
+
+  const handlecloseregister = () => {
+    setopenMenu(false);
+    localStorage.setItem("ublisYogaRegistration", false);
+  };
+
+  const openregistration = () => {
+    setRegistrationmodal(true);
+  };
+
+  const closeregistration = () => {
+    setRegistrationmodal(false);
+  };
+
   return (
     <div className="header">
+      {openmenu ? (
+        <RegistrationPopup
+          handlecloseregister={handlecloseregister}
+          openregistration={openregistration}
+        />
+      ) : null}
       {registrationmodal ? (
-        <RegistrationStepper handleclosebtn={handleclosebtn} />
+        <RegistrationStepper closeregistration={closeregistration} />
       ) : null}
       <header
         style={{
@@ -175,19 +271,21 @@ export default function Header() {
           {/* Conditional rendering of buttons or 'Register' text */}
           {isLoggedIn ? (
             <>
-              <button
-                className="lg:flex hidden"
-                style={{
-                  border: "2px solid #f95005",
-                  padding: "5px 40px",
-                  borderRadius: "8px",
-                  color: "#f95005",
-                  fontWeight: "bold",
-                }}
-                onClick={() => setRegistrationmodal(true)}
-              >
-                Register
-              </button>
+              {useStatus.followUpCount ? (
+                <button
+                  className="lg:flex hidden"
+                  style={{
+                    border: "2px solid #f95005",
+                    padding: "5px 40px",
+                    borderRadius: "8px",
+                    color: "#f95005",
+                    fontWeight: "bold",
+                  }}
+                  onClick={() => setRegistrationmodal(true)}
+                >
+                  Register
+                </button>
+              ) : null}
               {/* User Image */}
               <img
                 className="user-icon -ml-20 w-[35px] h-[35px] cursor-pointer"
@@ -201,7 +299,11 @@ export default function Header() {
                 <div className="dropdown absolute top-[10vh] right-3 mt-2 w-[150px] bg-white border border-gray-300 rounded-md shadow-lg z-10">
                   <ul>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                      Username
+                      {logindetails.name}
+                      <br />
+                      <span className="text-[14px] text-[#f95005]">
+                        {logindetails.username}
+                      </span>
                     </li>
                     <li
                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer"

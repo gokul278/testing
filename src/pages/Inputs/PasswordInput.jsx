@@ -27,10 +27,11 @@ const PasswordInput = ({
       />
       <label
         htmlFor={id}
-        className="absolute left-2 -top-2 z-[1] cursor-text px-2 text-[#ff5001] transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-white before:transition-all peer-placeholder-shown:text-[14px] peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-invalid:text-pink-500 peer-focus:cursor-default peer-focus:text-[14px] peer-focus:text-[#ff5001] peer-invalid:peer-focus:text-pink-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent"
+        className="absolute left-2 -top-3 z-[1] cursor-text px-2 text-[14px] text-[#ff5001] transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-white before:transition-all peer-placeholder-shown:text-[14px] peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-invalid:text-pink-500 peer-focus:cursor-default peer-focus:text-[14px] peer-focus:text-[#ff5001] peer-invalid:peer-focus:text-pink-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent"
       >
         {label}
       </label>
+
       {showPassword ? (
         <svg
           onClick={() => setShowPassword(!showPassword)}
