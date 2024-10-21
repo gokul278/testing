@@ -85,10 +85,39 @@ export const SignIn = () => {
 
         console.log(data);
 
+        const refUtIdValue = data.data.refUtId[0].refUtId;
+        if (data.data.refUtId && data.data.refUtId.length > 0) {
+          console.log(refUtIdValue); // This will output: 4
+        } else {
+          console.error("refUtId is undefined or empty");
+        }
         if (data.success) {
           localStorage.setItem("JWTtoken", "Bearer " + data.token + "");
-          localStorage.setItem("ublisYogaRegistration", true);
-          navigate("/");
+
+          // Check if refUtId exists and retrieve its value
+
+          console.log("refUtIdValue:", refUtIdValue);
+
+          if (
+            refUtIdValue === 3 ||
+            refUtIdValue === 2 ||
+            refUtIdValue === 1 ||
+            refUtIdValue === 9
+          ) {
+            navigate("/");
+          } else {
+            const jwtToken = localStorage.getItem("JWTtoken");
+
+            console.log("refUtIdValue----", refUtIdValue);
+            if (jwtToken && refUtIdValue !== null) {
+              const redirectUrl = `http://192.168.29.54:5173?JWTtoken=${encodeURIComponent(
+                jwtToken
+              )}&refUtId=${encodeURIComponent(refUtIdValue)}`;
+              window.open(redirectUrl, "_blank");
+            } else {
+              console.error("JWTtoken or refUtIdValue is null.");
+            }
+          }
         } else {
           setLoading(false);
 
