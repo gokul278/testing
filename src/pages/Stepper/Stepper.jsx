@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Stepper.css";
 import { useNavigate } from "react-router-dom";
 import Axios from "axios";
@@ -7,6 +7,7 @@ import TextInput from "../Inputs/TextInput";
 import PasswordInput from "../Inputs/PasswordInput";
 import ErrorMessage from "../Messages/ErrorMessage";
 import UsernameInput from "../Inputs/UsernameInput";
+import CountdownComponent from "../Countdown/Countdown";
 
 export const Stepper = () => {
   const navigate = useNavigate();
@@ -72,7 +73,7 @@ export const Stepper = () => {
             import.meta.env.VITE_ENCRYPTION_KEY
           );
 
-          if (data.success) {            
+          if (data.success) {
             setVerify(true); // Username is valid
           } else {
             setVerify(false); // Username is invalid
@@ -133,6 +134,7 @@ export const Stepper = () => {
   const [submitloadingStatus, setSubmitloadingStatus] = useState(false);
 
   const [successState, setSuccessState] = useState(false);
+  
 
   const [formerror1, setFormerror1] = useState({
     errorstatus: false,
@@ -298,7 +300,7 @@ export const Stepper = () => {
           setSuccessState(true);
           setTimeout(() => {
             navigate("/signin");
-          }, 1500);
+          }, 5000);
         } else {
           // If status is false in the response or an error status, handle it
           console.log("False part");
@@ -516,9 +518,17 @@ export const Stepper = () => {
             </div>
             <div className="w-[100%]" align="center">
               {successState ? (
-                <div className="w-[80%] flex justify-center " align="center">
-                  <div className="w-[100%] bg-green-400 text-[#ffffff] text-[16x] font-bold my-3 rounded py-2">
-                    Your Account Successfully Registered
+                <div className="w-[80%] flex justify-between " align="center">
+                  <div className="w-[88%] bg-green-400 text-[#ffffff] text-[16x] font-bold my-3 rounded py-2">
+                    Your Account Successfully Registered <CountdownComponent successState={successState} />
+                  </div>
+                  <div
+                    className="w-[10%] bg-[#ff5001] cursor-pointer text-[#ffffff] text-[16x] font-bold my-3 rounded py-2"
+                    onClick={() => {
+                      navigate("/signin");
+                    }}
+                  >
+                    Skip
                   </div>
                 </div>
               ) : (

@@ -11,7 +11,7 @@ import Axios from "axios";
 import CryptoJS from "crypto-js";
 import { useNavigate } from "react-router-dom";
 
-const RegistrationStepper = ({ closeregistration }) => {
+const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -321,6 +321,7 @@ const RegistrationStepper = ({ closeregistration }) => {
 
         if (data.success) {
           navigate("/");
+          handlecloseregister();
           closeregistration();
         }
       })
@@ -855,7 +856,7 @@ const RegistrationStepper = ({ closeregistration }) => {
                   <div className="w-[48%]">
                     <TextInput
                       id="height"
-                      type="tel"
+                      type="number"
                       name="height"
                       placeholder="your name"
                       label="Height in CM *"
@@ -867,7 +868,7 @@ const RegistrationStepper = ({ closeregistration }) => {
                   <div className="w-[48%]">
                     <TextInput
                       id="weight"
-                      type="tel"
+                      type="number"
                       name="weight"
                       placeholder="your name"
                       label="Weight in KG *"

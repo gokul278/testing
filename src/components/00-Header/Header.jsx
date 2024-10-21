@@ -210,7 +210,7 @@ export default function Header() {
         name: data.data[0].refStFName + " " + data.data[0].refStLName,
       });
     });
-  }, []);
+  } );
 
   // , [navigate]
 
@@ -236,7 +236,7 @@ export default function Header() {
         />
       ) : null}
       {registrationmodal ? (
-        <RegistrationStepper closeregistration={closeregistration} />
+        <RegistrationStepper handlecloseregister={handlecloseregister} closeregistration={closeregistration} />
       ) : null}
       <header
         style={{
