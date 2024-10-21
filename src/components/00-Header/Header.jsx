@@ -210,7 +210,7 @@ export default function Header() {
         name: data.data[0].refStFName + " " + data.data[0].refStLName,
       });
     });
-  });
+  }, []);
 
   // , [navigate]
 
