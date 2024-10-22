@@ -162,7 +162,6 @@ export default function Header() {
   const [openmenu, setopenMenu] = useState(false);
 
   useEffect(() => {
-
     Axios.get(
       import.meta.env.VITE_API_URL + "validatetoken",
       {
@@ -179,7 +178,7 @@ export default function Header() {
         import.meta.env.VITE_ENCRYPTION_KEY
       );
 
-      console.log(data);
+      // console.log(data);
 
       const refuId = data.data[0].refUtId;
       const validIds = [1, 2, 3, 9];
@@ -210,7 +209,7 @@ export default function Header() {
         name: data.data[0].refStFName + " " + data.data[0].refStLName,
       });
     });
-  } );
+  }, [navigate, openmenu, registrationmodal]);
 
   // , [navigate]
 
@@ -236,7 +235,10 @@ export default function Header() {
         />
       ) : null}
       {registrationmodal ? (
-        <RegistrationStepper handlecloseregister={handlecloseregister} closeregistration={closeregistration} />
+        <RegistrationStepper
+          handlecloseregister={handlecloseregister}
+          closeregistration={closeregistration}
+        />
       ) : null}
       <header
         style={{

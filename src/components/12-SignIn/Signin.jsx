@@ -105,8 +105,15 @@ export const SignIn = () => {
             refUtIdValue === 9
           ) {
             navigate("/");
+            localStorage.setItem("ublisYogaRegistration", true);
           } else {
             const jwtToken = localStorage.getItem("JWTtoken");
+            setLoading(false);
+
+            SetInputs({
+              username: "",
+              password: "",
+            });
 
             console.log("refUtIdValue----", refUtIdValue);
             if (jwtToken && refUtIdValue !== null) {
