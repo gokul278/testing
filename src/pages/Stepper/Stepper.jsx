@@ -134,7 +134,6 @@ export const Stepper = () => {
   const [submitloadingStatus, setSubmitloadingStatus] = useState(false);
 
   const [successState, setSuccessState] = useState(false);
-  
 
   const [formerror1, setFormerror1] = useState({
     errorstatus: false,
@@ -520,7 +519,8 @@ export const Stepper = () => {
               {successState ? (
                 <div className="w-[80%] flex justify-between " align="center">
                   <div className="w-[88%] bg-green-400 text-[#ffffff] text-[16x] font-bold my-3 rounded py-2">
-                    Your Account Successfully Registered <CountdownComponent successState={successState} />
+                    Your Account Successfully Registered{" "}
+                    <CountdownComponent successState={successState} />
                   </div>
                   <div
                     className="w-[10%] bg-[#ff5001] cursor-pointer text-[#ffffff] text-[16x] font-bold my-3 rounded py-2"

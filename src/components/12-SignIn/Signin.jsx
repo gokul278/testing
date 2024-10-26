@@ -85,13 +85,14 @@ export const SignIn = () => {
 
         console.log(data);
 
-        const refUtIdValue = data.data.refUtId[0].refUtId;
-        if (data.data.refUtId && data.data.refUtId.length > 0) {
-          console.log(refUtIdValue); // This will output: 4
-        } else {
-          console.error("refUtId is undefined or empty");
-        }
         if (data.success) {
+          const refUtIdValue = data.data.refUtId[0].refUtId;
+          if (data.data.refUtId && data.data.refUtId.length > 0) {
+            console.log(refUtIdValue); // This will output: 4
+          } else {
+            console.error("refUtId is undefined or empty");
+          }
+
           localStorage.setItem("JWTtoken", "Bearer " + data.token + "");
 
           // Check if refUtId exists and retrieve its value
@@ -117,10 +118,19 @@ export const SignIn = () => {
 
             console.log("refUtIdValue----", refUtIdValue);
             if (jwtToken && refUtIdValue !== null) {
-              const redirectUrl = `http://192.168.29.54:5173?JWTtoken=${encodeURIComponent(
-                jwtToken
-              )}&refUtId=${encodeURIComponent(refUtIdValue)}`;
-              window.open(redirectUrl, "_blank");
+              if (refUtIdValue !== 5) {
+                const redirectUrl = `http://localhost:5174?JWTtoken=${encodeURIComponent(
+                  jwtToken
+                )}&refUtId=${encodeURIComponent(refUtIdValue)}`;
+                window.open(redirectUrl, "_blank");
+                localStorage.removeItem("JWTtoken");
+              } else {
+                const redirectUrl = `http://localhost:5174/users/dashboard?JWTtoken=${encodeURIComponent(
+                  jwtToken
+                )}&refUtId=${encodeURIComponent(refUtIdValue)}`;
+                window.open(redirectUrl, "_blank");
+                localStorage.removeItem("JWTtoken");
+              }
             } else {
               console.error("JWTtoken or refUtIdValue is null.");
             }

@@ -178,7 +178,7 @@ export default function Header() {
         import.meta.env.VITE_ENCRYPTION_KEY
       );
 
-      // console.log(data);
+      console.log(data);
 
       const refuId = data.data[0].refUtId;
       const validIds = [1, 2, 3, 9];
@@ -188,28 +188,30 @@ export default function Header() {
         navigate("/signin");
       }
 
-      // if (data.registerBtn.signUpCount) {
-      //   // setopenMenu(false);
-      // }
+      if (data.registerBtn.signUpCount === true) {
+        setopenMenu(true);
+      } else {
+        setopenMenu(false);
+      }
 
       setUseStatus({
         signUpCount: data.registerBtn.signUpCount,
         followUpCount: data.registerBtn.followUpCount,
       });
 
-      if (
-        localStorage.getItem("ublisYogaRegistration") === "true" &&
-        data.registerBtn.followUpCount
-      ) {
-        setopenMenu(true);
-      }
+      // if (
+      //   localStorage.getItem("ublisYogaRegistration") === "true" &&
+      //   data.registerBtn.followUpCount
+      // ) {
+      //   setopenMenu(true);
+      // }
 
       setLogindetails({
         username: data.data[0].refUserName,
         name: data.data[0].refStFName + " " + data.data[0].refStLName,
       });
     });
-  }, [navigate, openmenu, registrationmodal]);
+  }, [navigate, registrationmodal]);
 
   // , [navigate]
 
