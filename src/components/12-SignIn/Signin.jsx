@@ -119,13 +119,13 @@ export const SignIn = () => {
             console.log("refUtIdValue----", refUtIdValue);
             if (jwtToken && refUtIdValue !== null) {
               if (refUtIdValue !== 5) {
-                const redirectUrl = `http://localhost:5174?JWTtoken=${encodeURIComponent(
+                const redirectUrl = `http://192.168.29.87:5174?JWTtoken=${encodeURIComponent(
                   jwtToken
                 )}&refUtId=${encodeURIComponent(refUtIdValue)}`;
                 window.open(redirectUrl, "_blank");
                 localStorage.removeItem("JWTtoken");
               } else {
-                const redirectUrl = `http://localhost:5174/users/dashboard?JWTtoken=${encodeURIComponent(
+                const redirectUrl = `http://192.168.29.87:5174/users/dashboard?JWTtoken=${encodeURIComponent(
                   jwtToken
                 )}&refUtId=${encodeURIComponent(refUtIdValue)}`;
                 window.open(redirectUrl, "_blank");
