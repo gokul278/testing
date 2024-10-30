@@ -25,6 +25,8 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
     dob: "",
     age: "",
     gender: "",
+    maritalstatus: "",
+    anniversarydate: "",
     caretakername: "",
     qualification: "",
     occupation: "",
@@ -46,7 +48,9 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
     breaks: "",
     activities: "",
     anthingelse: "",
+    memberlist: "",
     preferabletiming: "",
+    sessiontype: "",
     branch: "",
     others: "",
     medicaldetails: "",
@@ -102,19 +106,21 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
   }, []);
 
   const handleStateChange = (event) => {
-    const stateCode = event.target.value;
-    setSelectedState(stateCode);
-    if (stateCode) {
-      const stateCities = City.getCitiesOfState("IN", stateCode); // 'IN' for India
-      setCities(stateCities);
-    } else {
-      setCities([]); // Reset cities if no state is selected
-    }
+    if (event.target.name != "tempstate") {
+      const stateCode = event.target.value;
+      setSelectedState(stateCode);
+      if (stateCode) {
+        const stateCities = City.getCitiesOfState("IN", stateCode); // 'IN' for India
+        setCities(stateCities);
+      } else {
+        setCities([]); // Reset cities if no state is selected
+      }
 
-    setInputs({
-      ...inputs,
-      [event.target.name]: event.target.value,
-    });
+      setInputs({
+        ...inputs,
+        [event.target.name]: event.target.value,
+      });
+    }
   };
 
   const [selectedOption, setSelectedOption] = useState({
@@ -124,24 +130,41 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
     backpain: "",
   });
 
-  const [preferableTiming, setPreferableTiming] = useState([]);
-
   const [branchList, setBranchList] = useState([]);
 
-  // const [personalHealthProblem, setPersonalHealthProblem] = useState([]);
+  const [memberList, setMemberList] = useState([]);
 
-  const timingOptions = preferableTiming.map((timing) => {
-    const [key, value] = Object.entries(timing)[0]; // Extract the key-value pair from the object
-    return {
-      value: key, // The key (e.g., '1', '2', etc.) will be the value
-      label: value, // The actual timing string will be the label
-    };
-  });
+  const [preferTiming, setpreferTiming] = useState([]);
+
+  const [sessiontype, setSessionType] = useState([]);
+
+  // const [personalHealthProblem, setPersonalHealthProblem] = useState([]);
 
   const branchOptions = Object.entries(branchList).map(([value, label]) => ({
     value, // Key (e.g., '1')
     label, // Value (e.g., 'Chennai')
   }));
+
+  const memberlistOptions = Object.entries(memberList).map(
+    ([value, label]) => ({
+      value, // Key (e.g., '1')
+      label, // Value (e.g., 'Chennai')
+    })
+  );
+
+  const preferTimingOption = Object.entries(preferTiming).map(
+    ([value, label]) => ({
+      value, // Key (e.g., '1')
+      label, // Value (e.g., 'Chennai')
+    })
+  );
+
+  const sessionTypeOption = Object.entries(sessiontype).map(
+    ([value, label]) => ({
+      value, // Key (e.g., '1')
+      label, // Value (e.g., 'Chennai')
+    })
+  );
 
   useEffect(() => {
     Axios.get(
@@ -165,7 +188,6 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
 
         if (data.success) {
           localStorage.setItem("JWTtoken", "Bearer " + data.token + "");
-          setPreferableTiming(data.data.PreferableTiming);
           setBranchList(data.data.branchList);
           setInputs({
             ...inputs,
@@ -229,6 +251,75 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
       };
     }
 
+    if (name === "branch") {
+      Axios.post(
+        import.meta.env.VITE_API_URL + "profile/MemberList",
+        {
+          branchId: value,
+        },
+        {
+          headers: {
+            Authorization: localStorage.getItem("JWTtoken"),
+            "Content-Type": "application/json",
+          },
+        }
+      )
+        .then((res) => {
+          const data = decrypt(
+            res.data[1],
+            res.data[0],
+            import.meta.env.VITE_ENCRYPTION_KEY
+          );
+          console.log("Branch -----------", data.data);
+          setMemberList(data.data); // Make sure this updates memberList
+          setpreferTiming([]);
+          setSessionType([]);
+          // setInputs({
+          //   ...inputs,
+          //   preferabletiming: "",
+          //   sessiontype: "",
+          // });
+        })
+        .catch((err) => {
+          // Catching any 400 status or general errors
+          console.error("Error: ", err);
+        });
+    } else if (name === "memberlist") {
+      Axios.post(
+        import.meta.env.VITE_API_URL + "profile/sectionTime",
+        {
+          sectionId: parseInt(value),
+        },
+        {
+          headers: {
+            Authorization: localStorage.getItem("JWTtoken"),
+            "Content-Type": "application/json",
+          },
+        }
+      )
+        .then((res) => {
+          const data = decrypt(
+            res.data[1],
+            res.data[0],
+            import.meta.env.VITE_ENCRYPTION_KEY
+          );
+          console.log("Member List -----------", data.SectionTime);
+          setpreferTiming(data.SectionTime);
+          setSessionType(data.CustTime);
+        })
+        .catch((err) => {
+          // Catching any 400 status or general errors
+          console.error("Error: ", err);
+        });
+    } else if (name === "maritalstatus") {
+      if (value === "single") {
+        updatedInputs = {
+          ...updatedInputs,
+          anniversarydate: "",
+        };
+      }
+    }
+
     // Set the final updated inputs
     setInputs(updatedInputs);
   };
@@ -276,6 +367,12 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
           ref_su_occu: inputs.occupation,
           ref_su_guardian: inputs.caretakername,
           ref_su_timing: inputs.preferabletiming,
+          ref_su_branchId: parseInt(inputs.branch),
+          ref_su_seTId: parseInt(inputs.memberlist),
+          ref_su_prTimeId: parseInt(inputs.preferabletiming),
+          ref_su_seModeId: parseInt(inputs.sessiontype),
+          ref_su_MaritalStatus: inputs.maritalstatus,
+          ref_su_WeddingDate: inputs.anniversarydate,
         },
         generalhealth: {
           refHeight: inputs.height,
@@ -487,6 +584,7 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
                     />
                   </div>
                 </div>
+
                 <div
                   className="w-[90%] mb-[20px] flex justify-between"
                   align="start"
@@ -504,6 +602,42 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
                     onChange={(e) => handleInput(e)}
                   />
                 </div>
+
+                <div
+                  className="w-[90%] mb-[20px] flex justify-between"
+                  align="start"
+                >
+                  <div className="w-[48%]">
+                    <SelectInput
+                      id="maritalstatus"
+                      name="maritalstatus"
+                      label="Marital Status *"
+                      options={[
+                        { value: "single", label: "Single" },
+                        { value: "married", label: "Married" },
+                      ]}
+                      required
+                      value={inputs.maritalstatus}
+                      onChange={(e) => handleInput(e)}
+                    />
+                  </div>
+                  <div className="w-[48%]">
+                    <TextInput
+                      id="anniversarydate"
+                      type="date"
+                      name="anniversarydate"
+                      placeholder="your name"
+                      label="Anniversary Date *"
+                      required
+                      disabled={
+                        inputs.maritalstatus === "married" ? false : true
+                      }
+                      value={inputs.anniversarydate}
+                      onChange={(e) => handleInput(e)}
+                    />
+                  </div>
+                </div>
+
                 <div className="w-[90%] mb-[20px]" align="start">
                   <TextInput
                     id="father"
@@ -772,10 +906,12 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
                             required
                             value={inputs.tempcity}
                             onChange={(e) => {
-                              setInputs({
-                                ...inputs,
-                                [e.target.name]: e.target.value,
-                              });
+                              if (!inputs.addressboth) {
+                                setInputs({
+                                  ...inputs,
+                                  [e.target.name]: e.target.value,
+                                });
+                              }
                             }}
                             disabled={!selectedState}
                             className="relative w-full h-11 px-3 transition-all bg-white border-2 rounded outline-none appearance-none peer border-[#b3b4b6] text-[#4c4c4e] autofill:bg-white focus:border-[#ff5001] focus:focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
@@ -1073,13 +1209,40 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
                   </div>
                   <div className="w-[68%]">
                     <SelectInput
-                      id="preferabletiming"
+                      id="memberlist"
+                      name="memberlist"
+                      label="Member List *"
+                      required
+                      options={memberlistOptions}
+                      value={inputs.memberlist}
+                      onChange={(e) => handleInput(e)}
+                      disabled={inputs.branch ? false : true}
+                    />
+                  </div>
+                </div>
+
+                <div className="w-[90%] flex justify-between mb-[20px]">
+                  <div className="w-[68%]">
+                    <SelectInput
+                      id="memberlist"
                       name="preferabletiming"
                       label="Preferable Timing *"
-                      options={timingOptions}
+                      options={preferTimingOption}
                       required
-                      disabled={inputs.branch.length == 0}
+                      disabled={inputs.memberlist ? false : true}
                       value={inputs.preferabletiming}
+                      onChange={(e) => handleInput(e)}
+                    />
+                  </div>
+                  <div className="w-[30%]">
+                    <SelectInput
+                      id="sessiontype"
+                      name="sessiontype"
+                      label="Session Type *"
+                      disabled={inputs.memberlist ? false : true}
+                      options={sessionTypeOption}
+                      required
+                      value={inputs.sessiontype}
                       onChange={(e) => handleInput(e)}
                     />
                   </div>

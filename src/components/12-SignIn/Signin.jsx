@@ -61,6 +61,8 @@ export const SignIn = () => {
         errorstatus: true,
         errormessage: "Enter Username",
       });
+
+      setLoading(false);
       return;
     }
 
@@ -69,6 +71,7 @@ export const SignIn = () => {
         errorstatus: true,
         errormessage: "Enter Password",
       });
+      setLoading(false);
       return;
     }
 
