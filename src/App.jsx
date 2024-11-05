@@ -21,7 +21,7 @@ import "./App.css";
 // import { Toast } from "primereact/toast";
 import Testimonials from "./components/01-Home/Testimonials";
 import Signup from "./components/11-SignUp/Signup";
-import { SignIn } from "./components/12-SignIn/SignIn";
+import SignIn from "./components/12-SignIn/SignIn";
 
 function App() {
   // const toast = useRef(null);

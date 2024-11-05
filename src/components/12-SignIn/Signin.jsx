@@ -8,7 +8,7 @@ import ErrorMessage from "../../pages/Messages/ErrorMessage";
 import Axios from "axios";
 import CryptoJS from "crypto-js";
 
-export const SignIn = () => {
+export default function SignIn() {
   const navigate = useNavigate();
 
   const decrypt = (encryptedData, iv, key) => {
@@ -263,4 +263,4 @@ export const SignIn = () => {
       </div>
     </div>
   );
-};
+}
