@@ -106,6 +106,7 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
   }, []);
 
   const handleStateChange = (event) => {
+    1909;
     if (event.target.name != "tempstate") {
       const stateCode = event.target.value;
       setSelectedState(stateCode);
