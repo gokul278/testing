@@ -162,55 +162,57 @@ export default function Header() {
   const [openmenu, setopenMenu] = useState(false);
 
   useEffect(() => {
-    Axios.get(
-      import.meta.env.VITE_API_URL + "validatetoken",
-      {
-        headers: {
-          Authorization: localStorage.getItem("JWTtoken"),
-          "Content-Type": "application/json",
+    if (localStorage.getItem("JWTtoken")) {
+      Axios.get(
+        import.meta.env.VITE_API_URL + "validatetoken",
+        {
+          headers: {
+            Authorization: localStorage.getItem("JWTtoken"),
+            "Content-Type": "application/json",
+          },
         },
-      },
-      {}
-    ).then((res) => {
-      const data = decrypt(
-        res.data[1],
-        res.data[0],
-        import.meta.env.VITE_ENCRYPTION_KEY
-      );
+        {}
+      ).then((res) => {
+        const data = decrypt(
+          res.data[1],
+          res.data[0],
+          import.meta.env.VITE_ENCRYPTION_KEY
+        );
 
-      console.log(data);
+        console.log(data);
 
-      const refuId = data.data[0].refUtId;
-      const validIds = [1, 2, 3, 9];
+        const refuId = data.data[0].refUtId;
+        const validIds = [1, 2, 3, 9];
 
-      if (!validIds.includes(refuId)) {
-        localStorage.removeItem("JWTtoken");
-        navigate("/signin");
-      }
+        if (!validIds.includes(refuId)) {
+          localStorage.removeItem("JWTtoken");
+          navigate("/signin");
+        }
 
-      if (data.registerBtn.signUpCount === true) {
-        setopenMenu(true);
-      } else {
-        setopenMenu(false);
-      }
+        if (data.registerBtn.signUpCount === true) {
+          setopenMenu(true);
+        } else {
+          setopenMenu(false);
+        }
 
-      setUseStatus({
-        signUpCount: data.registerBtn.signUpCount,
-        followUpCount: data.registerBtn.followUpCount,
+        setUseStatus({
+          signUpCount: data.registerBtn.signUpCount,
+          followUpCount: data.registerBtn.followUpCount,
+        });
+
+        // if (
+        //   localStorage.getItem("ublisYogaRegistration") === "true" &&
+        //   data.registerBtn.followUpCount
+        // ) {
+        //   setopenMenu(true);
+        // }
+
+        setLogindetails({
+          username: data.data[0].refUserName,
+          name: data.data[0].refStFName + " " + data.data[0].refStLName,
+        });
       });
-
-      // if (
-      //   localStorage.getItem("ublisYogaRegistration") === "true" &&
-      //   data.registerBtn.followUpCount
-      // ) {
-      //   setopenMenu(true);
-      // }
-
-      setLogindetails({
-        username: data.data[0].refUserName,
-        name: data.data[0].refStFName + " " + data.data[0].refStLName,
-      });
-    });
+    }
   }, [navigate, registrationmodal]);
 
   // , [navigate]
