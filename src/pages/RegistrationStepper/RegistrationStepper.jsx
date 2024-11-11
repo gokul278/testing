@@ -233,6 +233,22 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
     );
   };
 
+  function calculateAge(dob) {
+    const birthDate = new Date(dob);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+
+    // Adjust age if the current date is before the birth date in the current year
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+
+    return age;
+  }
+
   const handleInput = (e) => {
     const { name, value } = e.target;
 
@@ -257,6 +273,7 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
         import.meta.env.VITE_API_URL + "profile/MemberList",
         {
           branchId: value,
+          refAge: inputs.age,
         },
         {
           headers: {
@@ -319,6 +336,11 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
           anniversarydate: "",
         };
       }
+    } else if (name === "dob") {
+      updatedInputs = {
+        ...updatedInputs,
+        age: calculateAge(value),
+      };
     }
 
     // Set the final updated inputs
@@ -581,6 +603,7 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
                       label="Age *"
                       value={inputs.age}
                       required
+                      readonly
                       onChange={(e) => handleInput(e)}
                     />
                   </div>
