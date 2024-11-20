@@ -10,6 +10,7 @@ import TextLabel from "../Labels/TextLabel";
 import Axios from "axios";
 import CryptoJS from "crypto-js";
 import { useNavigate } from "react-router-dom";
+import "./RegistrationStepper.css";
 
 const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
     lname: "",
     phoneno: "",
     whatsappno: "",
+    mode: "3",
     dob: "",
     age: "",
     gender: "",
@@ -39,10 +41,10 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
     perstate: "",
     percity: "",
     perpincode: "",
-    height: "",
-    weight: "",
+    height: 0,
+    weight: 0,
     bloodgroup: "",
-    bmi: "",
+    bmi: 0,
     bp: "",
     injuries: "",
     breaks: "",
@@ -153,12 +155,14 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
     })
   );
 
-  const preferTimingOption = Object.entries(preferTiming).map(
-    ([value, label]) => ({
-      value, // Key (e.g., '1')
-      label, // Value (e.g., 'Chennai')
-    })
-  );
+  // const preferTimingOption = Object.entries(preferTiming).map(
+  //   ([value, label]) => ({
+  //     value, // Key (e.g., '1')
+  //     label, // Value (e.g., 'Chennai')
+  //   })
+  // );
+
+  console.log(preferTiming);
 
   const sessionTypeOption = Object.entries(sessiontype).map(
     ([value, label]) => ({
@@ -166,6 +170,8 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
       label, // Value (e.g., 'Chennai')
     })
   );
+
+  const [modeofcontact, setModeofContact] = useState();
 
   useEffect(() => {
     Axios.get(
@@ -185,7 +191,7 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
           import.meta.env.VITE_ENCRYPTION_KEY
         );
 
-        console.log(data);
+        console.log("-------------->", data);
 
         if (data.success) {
           localStorage.setItem("JWTtoken", "Bearer " + data.token + "");
@@ -200,6 +206,13 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
             email: data.data.ProfileData.email,
             phoneno: data.data.ProfileData.phone,
           });
+
+          setModeofContact(
+            data.data.CommunicationLabel.map((item) => ({
+              value: item.refCtId, // Use refCtId as the value
+              label: item.refCtText, // Use refCtText as the label
+            }))
+          );
 
           // Map personal health problem data into the required structure
           const healthConditions = Object.entries(
@@ -321,7 +334,7 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
             res.data[0],
             import.meta.env.VITE_ENCRYPTION_KEY
           );
-          console.log("Member List -----------", data.SectionTime);
+          console.log("Member List -----------", data);
           setpreferTiming(data.SectionTime);
           setSessionType(data.CustTime);
         })
@@ -341,11 +354,33 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
         ...updatedInputs,
         age: calculateAge(value),
       };
+    } else if (name === "height") {
+      const bmi = calculateBMI(inputs.weight, value);
+      updatedInputs = {
+        ...updatedInputs,
+        bmi: bmi,
+      };
+    } else if (name === "weight") {
+      const bmi = calculateBMI(value, inputs.height);
+      updatedInputs = {
+        ...updatedInputs,
+        bmi: bmi,
+      };
     }
 
-    // Set the final updated inputs
     setInputs(updatedInputs);
   };
+
+  function calculateBMI(weight, height) {
+    // Convert height from cm to meters
+    let heightInMeters = height / 100;
+
+    // Calculate BMI
+    let bmi = weight / heightInMeters ** 2;
+
+    // Return the BMI rounded to two decimal places
+    return bmi.toFixed(2);
+  }
 
   const submitForm = () => {
     let updatedHealthProblem = [];
@@ -357,8 +392,6 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
     });
 
     setLoading(true);
-
-    console.log(updatedHealthProblem);
 
     Axios.post(
       import.meta.env.VITE_API_URL + "profile/RegisterData",
@@ -395,7 +428,10 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
           ref_su_prTimeId: parseInt(inputs.preferabletiming),
           ref_su_seModeId: parseInt(inputs.sessiontype),
           ref_su_MaritalStatus: inputs.maritalstatus,
-          ref_su_WeddingDate: inputs.anniversarydate,
+          ref_su_WeddingDate: inputs.anniversarydate
+            ? inputs.anniversarydate
+            : null,
+          ref_su_communicationPreference: parseInt(inputs.mode),
         },
         generalhealth: {
           refHeight: inputs.height,
@@ -443,6 +479,15 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
           navigate("/");
           handlecloseregister();
           closeregistration();
+          swal({
+            title: "Registration Completed!",
+            text: "Your registration was successful! Our team will contact you shortly.",
+            icon: "success",
+            customClass: {
+              title: "swal-title",
+              content: "swal-text",
+            },
+          });
         }
       })
       .catch((err) => {
@@ -503,6 +548,7 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
                     placeholder="your name"
                     label="Email ID *"
                     required
+                    readonly
                     value={inputs.email}
                     onChange={(e) => handleInput(e)}
                   />
@@ -519,6 +565,7 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
                       placeholder="your name"
                       label="First Name *"
                       required
+                      readonly
                       value={inputs.fname}
                       onChange={(e) => handleInput(e)}
                     />
@@ -531,8 +578,26 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
                       placeholder="your name"
                       label="Last Name *"
                       required
+                      readonly
                       value={inputs.lname}
                       onChange={(e) => handleInput(e)}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  className="w-[90%] mb-[20px] flex justify-between"
+                  align="start"
+                >
+                  <div className="w-[100%]">
+                    <SelectInput
+                      id="modeofcontact"
+                      name="mode"
+                      label="Mode of Contact *"
+                      value={inputs.mode}
+                      onChange={(e) => handleInput(e)}
+                      options={modeofcontact || []}
+                      required
                     />
                   </div>
                 </div>
@@ -544,7 +609,7 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
                   <div className="w-[100%] lg:w-[40%]">
                     <TextInput
                       id="phonenumber"
-                      type="tel"
+                      type="number"
                       name="phoneno"
                       placeholder="your name"
                       label="Phone Number *"
@@ -556,11 +621,13 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
                   <div className="w-[75%] lg:w-[40%]">
                     <TextInput
                       id="whatsappno"
-                      type="tel"
+                      type="number"
                       name="whatsappno"
                       placeholder="your name"
-                      label="Whatsapp Number"
-                      // required
+                      label={`Whatsapp Number ${
+                        inputs.mode === "3" ? "*" : ""
+                      }`}
+                      required={inputs.mode === "3" ? true : false}
                       value={inputs.whatsappno}
                       onChange={(e) => handleInput(e)}
                     />
@@ -1070,6 +1137,7 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
                       name="bmi"
                       placeholder="your name"
                       label="BMI"
+                      readonly
                       value={inputs.bmi}
                       onChange={(e) => handleInput(e)}
                     />
@@ -1251,7 +1319,10 @@ const RegistrationStepper = ({ closeregistration, handlecloseregister }) => {
                       id="memberlist"
                       name="preferabletiming"
                       label="Preferable Timing *"
-                      options={preferTimingOption}
+                      options={Object.values(preferTiming).map((element) => ({
+                        value: element.refTimeId, // Extract refTimeId as value
+                        label: element.formattedString, // Extract formattedString as label
+                      }))}
                       required
                       disabled={inputs.memberlist ? false : true}
                       value={inputs.preferabletiming}

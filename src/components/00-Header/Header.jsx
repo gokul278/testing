@@ -368,7 +368,7 @@ export default function Header() {
             onClick={toggleMenu}
           >
             <i
-              className={`pi pi-th-large toggle-icon ${
+              className={`bi bi-grid toggle-icon ${
                 open ? `rotate-${iconRotation}` : `rotate-0`
               }`}
               style={{
@@ -402,7 +402,7 @@ export default function Header() {
                     onClick={toggleMenu}
                   >
                     <i
-                      className={`pi pi-times toggle-icon ${
+                      className={`bi bi-x-lg toggle-icon ${
                         open ? `rotate-${iconRotation}` : `rotate-0`
                       }`}
                       style={{

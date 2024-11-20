@@ -57,12 +57,16 @@ export const Stepper = () => {
   const [verify, setVerify] = useState(false);
 
   const handleinput = (event) => {
-    setInput({
-      ...input,
-      [event.target.name]: event.target.value,
-    });
-
     if (event.target.name === "username") {
+      const regex = /^[a-z0-9]*$/;
+
+      if (regex.test(event.target.value)) {
+        setInput({
+          ...input,
+          [event.target.name]: event.target.value,
+        });
+      }
+
       Axios.post(import.meta.env.VITE_API_URL + "users/validateUserName", {
         temp_su_username: event.target.value,
       })
@@ -89,6 +93,11 @@ export const Stepper = () => {
               "Something went wrong. Please try again.",
           });
         });
+    } else {
+      setInput({
+        ...input,
+        [event.target.name]: event.target.value,
+      });
     }
 
     setFormerror1({
